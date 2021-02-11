@@ -1,0 +1,428 @@
+
+Times_Counters_Interrupts.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         0000029e  00000000  00000000  00000074  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .bss          00000001  00800060  00800060  00000312  2**0
+                  ALLOC
+  2 .stab         000005c4  00000000  00000000  00000314  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  3 .stabstr      00000756  00000000  00000000  000008d8  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+   8:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+   c:	0c 94 07 01 	jmp	0x20e	; 0x20e <__vector_3>
+  10:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  14:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  18:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  1c:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  20:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  24:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  28:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  2c:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  30:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  34:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  38:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  3c:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  40:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  44:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  48:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  4c:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+  50:	0c 94 3c 00 	jmp	0x78	; 0x78 <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d4 e0       	ldi	r29, 0x04	; 4
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+
+00000060 <__do_clear_bss>:
+  60:	10 e0       	ldi	r17, 0x00	; 0
+  62:	a0 e6       	ldi	r26, 0x60	; 96
+  64:	b0 e0       	ldi	r27, 0x00	; 0
+  66:	01 c0       	rjmp	.+2      	; 0x6a <.do_clear_bss_start>
+
+00000068 <.do_clear_bss_loop>:
+  68:	1d 92       	st	X+, r1
+
+0000006a <.do_clear_bss_start>:
+  6a:	a1 36       	cpi	r26, 0x61	; 97
+  6c:	b1 07       	cpc	r27, r17
+  6e:	e1 f7       	brne	.-8      	; 0x68 <.do_clear_bss_loop>
+  70:	0e 94 37 01 	call	0x26e	; 0x26e <main>
+  74:	0c 94 4d 01 	jmp	0x29a	; 0x29a <_exit>
+
+00000078 <__bad_interrupt>:
+  78:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+0000007c <timer0_init_normal>:
+#include <avr/interrupt.h>
+#include <util/delay.h>
+unsigned char counter = 0;
+//initializing timer0 on normal mode
+void timer0_init_normal(void)
+{
+  7c:	df 93       	push	r29
+  7e:	cf 93       	push	r28
+  80:	cd b7       	in	r28, 0x3d	; 61
+  82:	de b7       	in	r29, 0x3e	; 62
+	TCCR0 = (1<<CS02)|(1<<CS00); //Using the internal clock of the uC using 1024 prescaler
+  84:	e3 e5       	ldi	r30, 0x53	; 83
+  86:	f0 e0       	ldi	r31, 0x00	; 0
+  88:	85 e0       	ldi	r24, 0x05	; 5
+  8a:	80 83       	st	Z, r24
+	TIMSK|=(1<<TOIE0); //Enabling timer interrupt for overflow or normal mode through Timer mask register
+  8c:	a9 e5       	ldi	r26, 0x59	; 89
+  8e:	b0 e0       	ldi	r27, 0x00	; 0
+  90:	e9 e5       	ldi	r30, 0x59	; 89
+  92:	f0 e0       	ldi	r31, 0x00	; 0
+  94:	80 81       	ld	r24, Z
+  96:	81 60       	ori	r24, 0x01	; 1
+  98:	8c 93       	st	X, r24
+	SREG |=(1<<7);	//enabling global interrupt  bit in status word register
+  9a:	af e5       	ldi	r26, 0x5F	; 95
+  9c:	b0 e0       	ldi	r27, 0x00	; 0
+  9e:	ef e5       	ldi	r30, 0x5F	; 95
+  a0:	f0 e0       	ldi	r31, 0x00	; 0
+  a2:	80 81       	ld	r24, Z
+  a4:	80 68       	ori	r24, 0x80	; 128
+  a6:	8c 93       	st	X, r24
+	TCNT0 = 0;	// initializing timer/counter register with zero
+  a8:	e2 e5       	ldi	r30, 0x52	; 82
+  aa:	f0 e0       	ldi	r31, 0x00	; 0
+  ac:	10 82       	st	Z, r1
+}
+  ae:	cf 91       	pop	r28
+  b0:	df 91       	pop	r29
+  b2:	08 95       	ret
+
+000000b4 <timer0_init_ctc>:
+//definition of initializing function to timer0 on CTC mode
+void timer0_init_ctc(unsigned char counts)
+{
+  b4:	df 93       	push	r29
+  b6:	cf 93       	push	r28
+  b8:	0f 92       	push	r0
+  ba:	cd b7       	in	r28, 0x3d	; 61
+  bc:	de b7       	in	r29, 0x3e	; 62
+  be:	89 83       	std	Y+1, r24	; 0x01
+	OCR0 = counts;
+  c0:	ec e5       	ldi	r30, 0x5C	; 92
+  c2:	f0 e0       	ldi	r31, 0x00	; 0
+  c4:	89 81       	ldd	r24, Y+1	; 0x01
+  c6:	80 83       	st	Z, r24
+	TCCR0 = (1<<CS02)|(1<<CS00)|(1<<WGM01); //Using the internal clock of the uC using 1024 prescaler/Enabling timer0
+  c8:	e3 e5       	ldi	r30, 0x53	; 83
+  ca:	f0 e0       	ldi	r31, 0x00	; 0
+  cc:	8d e0       	ldi	r24, 0x0D	; 13
+  ce:	80 83       	st	Z, r24
+	TIMSK|=(1<<OCIE0); //Enabling timer interrupt for output compare mode through Timer mask register
+  d0:	a9 e5       	ldi	r26, 0x59	; 89
+  d2:	b0 e0       	ldi	r27, 0x00	; 0
+  d4:	e9 e5       	ldi	r30, 0x59	; 89
+  d6:	f0 e0       	ldi	r31, 0x00	; 0
+  d8:	80 81       	ld	r24, Z
+  da:	82 60       	ori	r24, 0x02	; 2
+  dc:	8c 93       	st	X, r24
+	SREG |=(1<<7);	//enabling global interrupt  bit in status word register
+  de:	af e5       	ldi	r26, 0x5F	; 95
+  e0:	b0 e0       	ldi	r27, 0x00	; 0
+  e2:	ef e5       	ldi	r30, 0x5F	; 95
+  e4:	f0 e0       	ldi	r31, 0x00	; 0
+  e6:	80 81       	ld	r24, Z
+  e8:	80 68       	ori	r24, 0x80	; 128
+  ea:	8c 93       	st	X, r24
+	TCNT0 = 0;	// initializing timer/counter register with zero
+  ec:	e2 e5       	ldi	r30, 0x52	; 82
+  ee:	f0 e0       	ldi	r31, 0x00	; 0
+  f0:	10 82       	st	Z, r1
+}
+  f2:	0f 90       	pop	r0
+  f4:	cf 91       	pop	r28
+  f6:	df 91       	pop	r29
+  f8:	08 95       	ret
+
+000000fa <timer1_init_normal>:
+//16-bit timer1 initialization on normal mode
+void timer1_init_normal(void)
+{
+  fa:	df 93       	push	r29
+  fc:	cf 93       	push	r28
+  fe:	cd b7       	in	r28, 0x3d	; 61
+ 100:	de b7       	in	r29, 0x3e	; 62
+	TCCR1A = 0;//do nothing with Timer/Counter1 control register A and just set it with zero
+ 102:	ef e4       	ldi	r30, 0x4F	; 79
+ 104:	f0 e0       	ldi	r31, 0x00	; 0
+ 106:	10 82       	st	Z, r1
+	TCCR1B = (1<<CS12)|(1<<CS10);//Enabling interrupt 1 on normal mode with prescaler of 1024
+ 108:	ee e4       	ldi	r30, 0x4E	; 78
+ 10a:	f0 e0       	ldi	r31, 0x00	; 0
+ 10c:	85 e0       	ldi	r24, 0x05	; 5
+ 10e:	80 83       	st	Z, r24
+	TIMSK |=(1<<TOIE1); //Timer1 interrupt on overflow enable
+ 110:	a9 e5       	ldi	r26, 0x59	; 89
+ 112:	b0 e0       	ldi	r27, 0x00	; 0
+ 114:	e9 e5       	ldi	r30, 0x59	; 89
+ 116:	f0 e0       	ldi	r31, 0x00	; 0
+ 118:	80 81       	ld	r24, Z
+ 11a:	84 60       	ori	r24, 0x04	; 4
+ 11c:	8c 93       	st	X, r24
+	SREG |= (1<<7); // setting Ibit of global interrupt enable
+ 11e:	af e5       	ldi	r26, 0x5F	; 95
+ 120:	b0 e0       	ldi	r27, 0x00	; 0
+ 122:	ef e5       	ldi	r30, 0x5F	; 95
+ 124:	f0 e0       	ldi	r31, 0x00	; 0
+ 126:	80 81       	ld	r24, Z
+ 128:	80 68       	ori	r24, 0x80	; 128
+ 12a:	8c 93       	st	X, r24
+	TCNT1 = 0; // initializing Timer/counter1 by zero
+ 12c:	ec e4       	ldi	r30, 0x4C	; 76
+ 12e:	f0 e0       	ldi	r31, 0x00	; 0
+ 130:	11 82       	std	Z+1, r1	; 0x01
+ 132:	10 82       	st	Z, r1
+}
+ 134:	cf 91       	pop	r28
+ 136:	df 91       	pop	r29
+ 138:	08 95       	ret
+
+0000013a <timer1_init_ctca>:
+
+/// initializing 16-bit timer1 on CTC mode
+void timer1_init_ctca(unsigned int counts)
+{
+ 13a:	df 93       	push	r29
+ 13c:	cf 93       	push	r28
+ 13e:	00 d0       	rcall	.+0      	; 0x140 <timer1_init_ctca+0x6>
+ 140:	cd b7       	in	r28, 0x3d	; 61
+ 142:	de b7       	in	r29, 0x3e	; 62
+ 144:	9a 83       	std	Y+2, r25	; 0x02
+ 146:	89 83       	std	Y+1, r24	; 0x01
+	OCR1A = counts;//initializing output compare register for timer1 A with given counts
+ 148:	ea e4       	ldi	r30, 0x4A	; 74
+ 14a:	f0 e0       	ldi	r31, 0x00	; 0
+ 14c:	89 81       	ldd	r24, Y+1	; 0x01
+ 14e:	9a 81       	ldd	r25, Y+2	; 0x02
+ 150:	91 83       	std	Z+1, r25	; 0x01
+ 152:	80 83       	st	Z, r24
+	TCCR1A = 0; // setting control register for timer1 with zero
+ 154:	ef e4       	ldi	r30, 0x4F	; 79
+ 156:	f0 e0       	ldi	r31, 0x00	; 0
+ 158:	10 82       	st	Z, r1
+	TCCR1B = (1<<CS12)|(1<<CS10)|(1<<WGM12); //enabling timer1 with internal clock on prescaler of 1024 on CTC mode
+ 15a:	ee e4       	ldi	r30, 0x4E	; 78
+ 15c:	f0 e0       	ldi	r31, 0x00	; 0
+ 15e:	8d e0       	ldi	r24, 0x0D	; 13
+ 160:	80 83       	st	Z, r24
+	TIMSK |= (1<<OCIE1A); //Enabling timer1 interrupt on output compare event
+ 162:	a9 e5       	ldi	r26, 0x59	; 89
+ 164:	b0 e0       	ldi	r27, 0x00	; 0
+ 166:	e9 e5       	ldi	r30, 0x59	; 89
+ 168:	f0 e0       	ldi	r31, 0x00	; 0
+ 16a:	80 81       	ld	r24, Z
+ 16c:	80 61       	ori	r24, 0x10	; 16
+ 16e:	8c 93       	st	X, r24
+	SREG |=(1<<7); // setting global interrupt but for enabling interrupts
+ 170:	af e5       	ldi	r26, 0x5F	; 95
+ 172:	b0 e0       	ldi	r27, 0x00	; 0
+ 174:	ef e5       	ldi	r30, 0x5F	; 95
+ 176:	f0 e0       	ldi	r31, 0x00	; 0
+ 178:	80 81       	ld	r24, Z
+ 17a:	80 68       	ori	r24, 0x80	; 128
+ 17c:	8c 93       	st	X, r24
+	TCNT1 = 0; // initializing timer/counter1 register with zero
+ 17e:	ec e4       	ldi	r30, 0x4C	; 76
+ 180:	f0 e0       	ldi	r31, 0x00	; 0
+ 182:	11 82       	std	Z+1, r1	; 0x01
+ 184:	10 82       	st	Z, r1
+
+}
+ 186:	0f 90       	pop	r0
+ 188:	0f 90       	pop	r0
+ 18a:	cf 91       	pop	r28
+ 18c:	df 91       	pop	r29
+ 18e:	08 95       	ret
+
+00000190 <timer2_init_normal>:
+//Timer/Counter2 initializing function definition
+void timer2_init_normal(void)
+{
+ 190:	df 93       	push	r29
+ 192:	cf 93       	push	r28
+ 194:	cd b7       	in	r28, 0x3d	; 61
+ 196:	de b7       	in	r29, 0x3e	; 62
+	TCCR2 = (1<<CS22)|(1<<CS21)|(1<<CS20); // Enabling timer2 on normal mode with prescaler of 1024
+ 198:	e5 e4       	ldi	r30, 0x45	; 69
+ 19a:	f0 e0       	ldi	r31, 0x00	; 0
+ 19c:	87 e0       	ldi	r24, 0x07	; 7
+ 19e:	80 83       	st	Z, r24
+	TIMSK|= (1<<TOIE2); // Enabling timer interrupt on overflow
+ 1a0:	a9 e5       	ldi	r26, 0x59	; 89
+ 1a2:	b0 e0       	ldi	r27, 0x00	; 0
+ 1a4:	e9 e5       	ldi	r30, 0x59	; 89
+ 1a6:	f0 e0       	ldi	r31, 0x00	; 0
+ 1a8:	80 81       	ld	r24, Z
+ 1aa:	80 64       	ori	r24, 0x40	; 64
+ 1ac:	8c 93       	st	X, r24
+	SREG|=(1<<7); // Enabling global interrupt
+ 1ae:	af e5       	ldi	r26, 0x5F	; 95
+ 1b0:	b0 e0       	ldi	r27, 0x00	; 0
+ 1b2:	ef e5       	ldi	r30, 0x5F	; 95
+ 1b4:	f0 e0       	ldi	r31, 0x00	; 0
+ 1b6:	80 81       	ld	r24, Z
+ 1b8:	80 68       	ori	r24, 0x80	; 128
+ 1ba:	8c 93       	st	X, r24
+	TCNT2 = 0; // initializing timer/counter2 register with zero
+ 1bc:	e4 e4       	ldi	r30, 0x44	; 68
+ 1be:	f0 e0       	ldi	r31, 0x00	; 0
+ 1c0:	10 82       	st	Z, r1
+}
+ 1c2:	cf 91       	pop	r28
+ 1c4:	df 91       	pop	r29
+ 1c6:	08 95       	ret
+
+000001c8 <timer2_init_ctc>:
+//initializing Timer/Counter2 on CTC mode
+void timer2_init_ctc(unsigned char counts)
+{
+ 1c8:	df 93       	push	r29
+ 1ca:	cf 93       	push	r28
+ 1cc:	0f 92       	push	r0
+ 1ce:	cd b7       	in	r28, 0x3d	; 61
+ 1d0:	de b7       	in	r29, 0x3e	; 62
+ 1d2:	89 83       	std	Y+1, r24	; 0x01
+	OCR2 = counts; //setting the compare value in the output compare register
+ 1d4:	e3 e4       	ldi	r30, 0x43	; 67
+ 1d6:	f0 e0       	ldi	r31, 0x00	; 0
+ 1d8:	89 81       	ldd	r24, Y+1	; 0x01
+ 1da:	80 83       	st	Z, r24
+	TCCR2 = (1<<CS22)|(1<<CS21)|(1<<CS20)|(1<<WGM21); // Enabling Timer/Counter2 on 1024prescaler and CTC mode
+ 1dc:	e5 e4       	ldi	r30, 0x45	; 69
+ 1de:	f0 e0       	ldi	r31, 0x00	; 0
+ 1e0:	8f e0       	ldi	r24, 0x0F	; 15
+ 1e2:	80 83       	st	Z, r24
+	TIMSK |=(1<<OCIE2); // Enabling timer/counter2 interrupt on output compare
+ 1e4:	a9 e5       	ldi	r26, 0x59	; 89
+ 1e6:	b0 e0       	ldi	r27, 0x00	; 0
+ 1e8:	e9 e5       	ldi	r30, 0x59	; 89
+ 1ea:	f0 e0       	ldi	r31, 0x00	; 0
+ 1ec:	80 81       	ld	r24, Z
+ 1ee:	80 68       	ori	r24, 0x80	; 128
+ 1f0:	8c 93       	st	X, r24
+	SREG |= (1<<7); // Enabling global interrupts
+ 1f2:	af e5       	ldi	r26, 0x5F	; 95
+ 1f4:	b0 e0       	ldi	r27, 0x00	; 0
+ 1f6:	ef e5       	ldi	r30, 0x5F	; 95
+ 1f8:	f0 e0       	ldi	r31, 0x00	; 0
+ 1fa:	80 81       	ld	r24, Z
+ 1fc:	80 68       	ori	r24, 0x80	; 128
+ 1fe:	8c 93       	st	X, r24
+	TCNT2 = 0; //initializing timer/counter2 register with zero
+ 200:	e4 e4       	ldi	r30, 0x44	; 68
+ 202:	f0 e0       	ldi	r31, 0x00	; 0
+ 204:	10 82       	st	Z, r1
+}
+ 206:	0f 90       	pop	r0
+ 208:	cf 91       	pop	r28
+ 20a:	df 91       	pop	r29
+ 20c:	08 95       	ret
+
+0000020e <__vector_3>:
+///interrupt service routine
+ISR(TIMER2_COMP_vect)
+{
+ 20e:	1f 92       	push	r1
+ 210:	0f 92       	push	r0
+ 212:	0f b6       	in	r0, 0x3f	; 63
+ 214:	0f 92       	push	r0
+ 216:	11 24       	eor	r1, r1
+ 218:	8f 93       	push	r24
+ 21a:	9f 93       	push	r25
+ 21c:	af 93       	push	r26
+ 21e:	bf 93       	push	r27
+ 220:	ef 93       	push	r30
+ 222:	ff 93       	push	r31
+ 224:	df 93       	push	r29
+ 226:	cf 93       	push	r28
+ 228:	cd b7       	in	r28, 0x3d	; 61
+ 22a:	de b7       	in	r29, 0x3e	; 62
+	if(counter < 4)
+ 22c:	80 91 60 00 	lds	r24, 0x0060
+ 230:	84 30       	cpi	r24, 0x04	; 4
+ 232:	30 f4       	brcc	.+12     	; 0x240 <__vector_3+0x32>
+	{
+		counter++; //incrementing the unsigned 8-bit variable
+ 234:	80 91 60 00 	lds	r24, 0x0060
+ 238:	8f 5f       	subi	r24, 0xFF	; 255
+ 23a:	80 93 60 00 	sts	0x0060, r24
+ 23e:	0a c0       	rjmp	.+20     	; 0x254 <__vector_3+0x46>
+	}else{
+		PORTC^=(1<<0);
+ 240:	a5 e3       	ldi	r26, 0x35	; 53
+ 242:	b0 e0       	ldi	r27, 0x00	; 0
+ 244:	e5 e3       	ldi	r30, 0x35	; 53
+ 246:	f0 e0       	ldi	r31, 0x00	; 0
+ 248:	90 81       	ld	r25, Z
+ 24a:	81 e0       	ldi	r24, 0x01	; 1
+ 24c:	89 27       	eor	r24, r25
+ 24e:	8c 93       	st	X, r24
+		counter = 0;
+ 250:	10 92 60 00 	sts	0x0060, r1
+	}
+}
+ 254:	cf 91       	pop	r28
+ 256:	df 91       	pop	r29
+ 258:	ff 91       	pop	r31
+ 25a:	ef 91       	pop	r30
+ 25c:	bf 91       	pop	r27
+ 25e:	af 91       	pop	r26
+ 260:	9f 91       	pop	r25
+ 262:	8f 91       	pop	r24
+ 264:	0f 90       	pop	r0
+ 266:	0f be       	out	0x3f, r0	; 63
+ 268:	0f 90       	pop	r0
+ 26a:	1f 90       	pop	r1
+ 26c:	18 95       	reti
+
+0000026e <main>:
+int main(void)
+{
+ 26e:	df 93       	push	r29
+ 270:	cf 93       	push	r28
+ 272:	cd b7       	in	r28, 0x3d	; 61
+ 274:	de b7       	in	r29, 0x3e	; 62
+	timer2_init_ctc(244);/*timer1 interrupt on overflow will toggle the led connected on portc pin0 once every 8.3seconds*/
+ 276:	84 ef       	ldi	r24, 0xF4	; 244
+ 278:	0e 94 e4 00 	call	0x1c8	; 0x1c8 <timer2_init_ctc>
+	//initializing the LED on GPIOPC - active high
+	DDRC |= (1<<0);// setting bit/pin 0 in PORTC as output
+ 27c:	a4 e3       	ldi	r26, 0x34	; 52
+ 27e:	b0 e0       	ldi	r27, 0x00	; 0
+ 280:	e4 e3       	ldi	r30, 0x34	; 52
+ 282:	f0 e0       	ldi	r31, 0x00	; 0
+ 284:	80 81       	ld	r24, Z
+ 286:	81 60       	ori	r24, 0x01	; 1
+ 288:	8c 93       	st	X, r24
+	PORTC &=~(1<<0); // clearing bit 0 in PORTC as the LED is active HIGH /initialized by zero
+ 28a:	a5 e3       	ldi	r26, 0x35	; 53
+ 28c:	b0 e0       	ldi	r27, 0x00	; 0
+ 28e:	e5 e3       	ldi	r30, 0x35	; 53
+ 290:	f0 e0       	ldi	r31, 0x00	; 0
+ 292:	80 81       	ld	r24, Z
+ 294:	8e 7f       	andi	r24, 0xFE	; 254
+ 296:	8c 93       	st	X, r24
+ 298:	ff cf       	rjmp	.-2      	; 0x298 <main+0x2a>
+
+0000029a <_exit>:
+ 29a:	f8 94       	cli
+
+0000029c <__stop_program>:
+ 29c:	ff cf       	rjmp	.-2      	; 0x29c <__stop_program>
